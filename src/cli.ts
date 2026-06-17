@@ -1,11 +1,11 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 import { Command } from 'commander';
 import { scanAlbum } from './scanAlbum.js';
 import { renderAlbumVideo } from './renderAlbumVideo.js';
 import { renderTrackVideos } from './renderTrackVideo.js';
 
 const program = new Command();
-program.name('album2video').description('Turn an album folder into YouTube-ready videos');
+program.name('album2tube').description('Turn an album folder into YouTube-ready videos');
 
 program
   .command('album')

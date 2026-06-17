@@ -3,19 +3,35 @@
 Turn an album folder into YouTube-ready videos. Point it at a directory of
 audio files plus a cover image, get back MP4s with descriptions and metadata.
 
-## Requirements
-
-- Node 18+
-- `ffmpeg` and `ffprobe` on PATH
-
 ## Install
 
+### From a release binary
+
+Download the binary for your platform from the [Releases](../../releases) page.
+
+**Linux / macOS** — install ffmpeg first via your package manager:
+
 ```
-npm install
-npm run build
+sudo apt install ffmpeg      # Debian/Ubuntu
+sudo dnf install ffmpeg      # Fedora
+sudo pacman -S ffmpeg        # Arch
+brew install ffmpeg          # macOS
 ```
 
-The CLI lives at `dist/cli.js`.
+Then run `./album2tube-<platform>`.
+
+**Windows** — download the zip. It contains `album2tube.exe`, `ffmpeg.exe`,
+and `ffprobe.exe` side by side. Extract everything into the same folder and
+run `album2tube.exe` from a terminal. No separate install needed.
+
+### From source
+
+```
+bun install
+bun src/cli.ts --help
+```
+
+Requires Bun 1.x and ffmpeg on PATH.
 
 ## Usage
 
@@ -24,7 +40,7 @@ Two modes.
 **One video per track:**
 
 ```
-node dist/cli.js tracks ./path/to/album --playlist "Some Playlist Name"
+album2tube tracks ./path/to/album --playlist "Some Playlist Name"
 ```
 
 Produces:
@@ -44,7 +60,7 @@ album/out/tracks/
 **One concatenated video for the whole album:**
 
 ```
-node dist/cli.js album ./path/to/album
+album2tube album ./path/to/album
 ```
 
 Produces:

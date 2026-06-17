@@ -1,8 +1,19 @@
 import path from 'node:path';
+import { existsSync } from 'node:fs';
 import fs from 'fs-extra';
 import { execa } from 'execa';
 import cliProgress from 'cli-progress';
 import type { Track } from './types.js';
+
+// Resolve ffmpeg's path. First look next to our own executable — that's how
+// the Windows release ships ffmpeg.exe (same pattern as yt-dlp). If not
+// found there, fall back to the bare name and let the OS resolve via PATH.
+function resolveFfmpeg(): string {
+  const exe = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
+  const sibling = path.join(path.dirname(process.execPath), exe);
+  return existsSync(sibling) ? sibling : 'ffmpeg';
+}
+const FFMPEG = resolveFfmpeg();
 
 // Scale cover so its longest side is 1080 (keeps aspect, no padding).
 // Round both dimensions to an even number — libx264 with yuv420p requires it.
@@ -47,7 +58,7 @@ async function runFfmpeg(args: string[], totalSec: number, label: string): Promi
     : null;
   bar?.start(Math.round(totalSec), 0);
 
-  const proc = execa('ffmpeg', [...args, '-progress', 'pipe:1', '-nostats'], {
+  const proc = execa(FFMPEG, [...args, '-progress', 'pipe:1', '-nostats'], {
     stdio: ['ignore', 'pipe', 'pipe'],
     reject: false,
   });
