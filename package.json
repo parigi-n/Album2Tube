@@ -1,6 +1,6 @@
 {
   "name": "album2tube",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Turn an album folder into YouTube-ready videos.",
   "type": "module",
   "scripts": {
