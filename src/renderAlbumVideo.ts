@@ -37,4 +37,11 @@ export async function renderAlbumVideo(album: Album): Promise<void> {
   }, { spaces: 2 });
 
   await fs.remove(workDir);
+
+  const totalSec = album.tracks.reduce((acc, t) => acc + t.duration, 0);
+  console.log('');
+  console.log(`Done. Album video written (${formatTimestamp(totalSec)}, ${album.tracks.length} tracks):`);
+  console.log(`  ${videoPath}`);
+  console.log(`  ${descPath}     — paste into the description field (timestamps become YouTube chapters)`);
+  console.log(`  ${metaPath}`);
 }

@@ -34,4 +34,12 @@ export async function renderTrackVideos(album: Album, opts: RenderOptions): Prom
       source: path.basename(track.filePath),
     }, { spaces: 2 });
   }
+
+  console.log('');
+  console.log(`Done. ${album.tracks.length} videos written to:`);
+  console.log(`  ${base}`);
+  console.log('Each track folder contains:');
+  console.log('  video.mp4         — upload to YouTube');
+  console.log('  description.txt   — paste into the description field');
+  console.log('  metadata.json     — machine-readable summary');
 }

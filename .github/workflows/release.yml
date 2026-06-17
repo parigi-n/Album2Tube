@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Verify tag matches package.json version
+        run: |
+          PKG_VERSION=v$(node -p "require('./package.json').version")
+          if [ "$PKG_VERSION" != "${{ github.ref_name }}" ]; then
+            echo "Tag ${{ github.ref_name }} does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Type-check
+        run: bun run check
+
+      - name: Build all targets
+        run: bun run build:all
+
+      - name: Download ffmpeg static (Windows x64)
+        run: |
+          mkdir -p tmp/ffmpeg-win
+          curl -L -o tmp/ffmpeg-win.zip \
+            https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-win64-gpl.zip
+          unzip -j tmp/ffmpeg-win.zip '*/bin/ffmpeg.exe' '*/bin/ffprobe.exe' -d tmp/ffmpeg-win
+
+      - name: Package Windows release zip
+        run: |
+          mkdir -p release/album2tube-windows-x64
+          cp dist/album2tube-windows-x64.exe release/album2tube-windows-x64/album2tube.exe
+          cp tmp/ffmpeg-win/ffmpeg.exe release/album2tube-windows-x64/
+          cp tmp/ffmpeg-win/ffprobe.exe release/album2tube-windows-x64/
+          cp README.md release/album2tube-windows-x64/
+          cd release && zip -r album2tube-windows-x64.zip album2tube-windows-x64
+
+      - name: Package Linux / macOS tarballs
+        run: |
+          mkdir -p release
+          for target in linux-x64 linux-arm64 macos-x64 macos-arm64; do
+            cp dist/album2tube-$target release/album2tube-$target
+            chmod +x release/album2tube-$target
+          done
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/album2tube-windows-x64.zip
+            release/album2tube-linux-x64
+            release/album2tube-linux-arm64
+            release/album2tube-macos-x64
+            release/album2tube-macos-arm64
+          generate_release_notes: true
