@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import type { Album, RenderOptions } from './types.js';
-import { outDir, trackDirName } from './paths.js';
+import { fsSafeFilename, outDir, trackDirName } from './paths.js';
 import { renderTrackVideo } from './ffmpeg.js';
 import { trackDescription } from './descriptions.js';
 
@@ -16,7 +16,9 @@ export async function renderTrackVideos(album: Album, opts: RenderOptions): Prom
     const dir = path.join(base, trackDirName(trackNo, track.title));
     await fs.ensureDir(dir);
 
-    const videoPath = path.join(dir, 'video.mp4');
+    // Filename = track title so YouTube Studio prefills the upload's title.
+    const videoName = `${fsSafeFilename(track.title)}.mp4`;
+    const videoPath = path.join(dir, videoName);
     const descPath = path.join(dir, 'description.txt');
     const metaPath = path.join(dir, 'metadata.json');
 
@@ -39,7 +41,9 @@ export async function renderTrackVideos(album: Album, opts: RenderOptions): Prom
   console.log(`Done. ${album.tracks.length} videos written to:`);
   console.log(`  ${base}`);
   console.log('Each track folder contains:');
-  console.log('  video.mp4         — upload to YouTube');
+  console.log('  <Track Title>.mp4 — upload to YouTube (filename prefills the title)');
   console.log('  description.txt   — paste into the description field');
   console.log('  metadata.json     — machine-readable summary');
+  console.log('');
+  console.log(`Tip: run \`album2tube next ${base}\` to upload one track at a time.`);
 }

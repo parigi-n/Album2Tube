@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { scanAlbum } from './scanAlbum.js';
 import { renderAlbumVideo } from './renderAlbumVideo.js';
 import { renderTrackVideos } from './renderTrackVideo.js';
+import { nextUpload } from './nextUpload.js';
 
 const program = new Command();
 program.name('album2tube').description('Turn an album folder into YouTube-ready videos');
@@ -24,6 +25,14 @@ program
   .action(async (folder: string, opts: { playlist?: string }) => {
     const album = await scanAlbum(folder);
     await renderTrackVideos(album, { playlist: opts.playlist });
+  });
+
+program
+  .command('next')
+  .description('Pick the next non-uploaded track, copy its description to the clipboard, mark uploaded on confirm')
+  .argument('<tracks-dir>', 'tracks output directory (e.g. <album>/out/tracks)')
+  .action(async (tracksDir: string) => {
+    await nextUpload(tracksDir);
   });
 
 program.parseAsync().catch((err) => {

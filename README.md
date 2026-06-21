@@ -48,14 +48,31 @@ Produces:
 ```
 album/out/tracks/
   01-first-track/
-    video.mp4
+    First Track.mp4
     description.txt
     metadata.json
   02-second-track/
     ...
 ```
 
+The MP4 is named after the track title so YouTube Studio pre-fills the title
+field from the filename — one less thing to retype.
+
 `--playlist` is optional. When set, it's added to each track's description.
+
+### Uploading tracks one at a time
+
+Uploading 50+ tracks manually is tedious. To make it less so:
+
+```
+album2tube next ./path/to/album/out/tracks
+```
+
+This picks the next track that hasn't been uploaded yet, copies its
+`description.txt` to your clipboard, and prints the file path. Drag the MP4
+into YouTube Studio, paste the description, hit publish, come back to the
+terminal and press Enter — it touches a `.uploaded` marker in the folder so
+the next run skips to the following track. Run again to keep going.
 
 **One concatenated video for the whole album:**
 
@@ -121,6 +138,10 @@ filler (e.g. blurred background) into the video itself.
 
 Each output directory contains:
 
-- `video.mp4`
+- The MP4 video — named `video.mp4` in album mode, `<Track Title>.mp4` in tracks mode
 - `description.txt` — paste into the YouTube description field
 - `metadata.json` — machine-readable summary (track list, durations, offsets)
+
+In tracks mode, an empty `.uploaded` file is dropped into a track folder once
+you confirm an upload via `album2tube next` — delete it to re-queue that
+track.
